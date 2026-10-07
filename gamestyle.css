@@ -1,9 +1,34 @@
+html,
 body {
     margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     background-color: #000000;
 }
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+#gameContainer canvas {
+    display: block;
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
 #dialogue-overlay {
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 18px;
@@ -12,23 +37,27 @@ body {
     pointer-events: none;
     z-index: 100;
 }
+
 .dialogue-box {
     background: rgba(8, 8, 8, 0.93);
-    border: 2px solid rgba(255,255,255,0.35);
+    border: 2px solid rgba(255, 255, 255, 0.35);
     border-radius: 12px;
     padding: 16px 22px;
     width: 90%;
     max-width: 680px;
     color: white;
     font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.55);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.55);
+    box-sizing: border-box;
 }
+
 .dialogue-name {
     color: #c8ff7a;
     font-size: 17px;
     font-weight: bold;
     margin-bottom: 8px;
 }
+
 .dialogue-text {
     color: #ffffff;
     font-size: 18px;
