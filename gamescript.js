@@ -774,8 +774,8 @@ function restartGame() {
     scene.cameras.main.fadeIn(300);
 }
 
-var config = {
 
+var config = {
     type: Phaser.AUTO,
 
     width: 710,
@@ -786,7 +786,9 @@ var config = {
     physics: {
         default: "arcade",
         arcade: {
-            gravity: { y: 980 },
+            gravity: {
+                y: 980
+            },
             debug: false
         }
     },
