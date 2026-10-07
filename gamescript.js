@@ -778,8 +778,8 @@ function restartGame() {
 var config = {
     type: Phaser.AUTO,
 
-    width: 710,
-    height: 500,
+    width: window.innerWidth,
+    height: window.innerHeight,
 
     parent: "gameContainer",
 
@@ -801,10 +801,8 @@ var config = {
     },
 
     scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 710,
-        height: 500
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
 
