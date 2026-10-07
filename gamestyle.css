@@ -1,84 +1,64 @@
-* {
+html,
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    /* 关键：body 背景色跟游戏天空一致，FIT 模式下留出的边看起来就是天空，不会有突兀的黑边 */
-    background: #87CEEB;
-    font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+    background-color: #000000;
 }
 
-#gameContainer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #87CEEB;
+body {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* 关键：canvas 由 Phaser 控制大小，这里不要强制 width/height，否则会拉伸变形 */
+#gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 不要强制设置 width / height */
 #gameContainer canvas {
     display: block;
-    margin: 0 auto;
 }
 
 #dialogue-overlay {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 18px;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
-    padding: 0 16px 20px 16px;
     pointer-events: none;
-    z-index: 1000;
-    width: 100%;
-    box-sizing: border-box;
+    z-index: 100;
 }
 
 .dialogue-box {
     background: rgba(8, 8, 8, 0.93);
     border: 2px solid rgba(255, 255, 255, 0.35);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 16px 22px;
-    width: 100%;
+    width: 90%;
     max-width: 680px;
     color: white;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.55);
     box-sizing: border-box;
 }
 
 .dialogue-name {
     color: #c8ff7a;
-    font-size: clamp(15px, 4vw, 19px);
+    font-size: 17px;
     font-weight: bold;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .dialogue-text {
-    color: #fff;
-    font-size: clamp(16px, 4.5vw, 20px);
-    line-height: 1.5;
-    word-break: break-word;
-}
-
-.danger-dialogue .dialogue-box {
-    border-color: #ff4d4d;
-    box-shadow: 0 0 25px rgba(255, 60, 60, 0.6);
-}
-
-@media (max-width: 480px) {
-    #dialogue-overlay { padding: 0 10px 14px 10px; }
-    .dialogue-box { padding: 12px 16px; border-radius: 12px; }
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.55;
 }
