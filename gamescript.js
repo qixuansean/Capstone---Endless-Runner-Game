@@ -1,5 +1,5 @@
 /* ============================================================
-   gamescript.js — 固定世界尺寸 + FIT 缩放（最终调整版）
+   gamescript.js — 固定世界尺寸 + FIT 缩放（rock 修复版）
    ============================================================ */
 
 let scene;
@@ -107,7 +107,6 @@ function preload() {
     scene.load.spritesheet("dino_fall", "resources/Dino_FallAnim.png", {
         frameWidth: 632, frameHeight: 402
     });
-    // 已删除 pit
     scene.load.image("jet", "resources/jet.png");
     scene.load.image("bullet", "resources/bullet.png");
     scene.load.image("familyDino", "resources/familyDino.png");
@@ -218,7 +217,7 @@ function create() {
         });
     }
 
-    // ---- 玩家（缩小到 0.18，原 0.3 缩小约 1.7 倍）----
+    // ---- 玩家（缩小到 0.18）----
     player = scene.physics.add.sprite(200, GROUND_Y - 60, "dino_run");
     player.setScale(0.18);
     if (player.anims && scene.anims.exists("run")) player.play("run");
@@ -226,13 +225,11 @@ function create() {
     player.setOffset(160, 60);
     player.setDepth(4);
 
-    // ---- 岩石（站在地面上）----
-    rock = scene.physics.add.sprite(GAME_W + 200, GROUND_Y - 60, "rock");
-    rock.setScale(0.8);
+    // ---- 岩石（站在地面上，可见，可碰撞）----
+    rock = scene.physics.add.sprite(GAME_W + 200, GROUND_Y - 40, "rock");
+    rock.setScale(0.6);
     rock.setDepth(3);
-    rock.body.setSize(60, 60);
-    rock.body.setOffset(20, 20);
-    rock.setBounce(0);
+    rock.body.setSize(rock.width * 0.8, rock.height * 0.8, true);
 
     // 距离文字
     distanceText = scene.add.text(16, 12, "Distance: 0.00 m", {
@@ -392,7 +389,6 @@ function fireBullet() {
     const bullet = scene.physics.add.sprite(fighterJet.x - 30, fighterJet.y, "bullet");
     bullet.setScale(0.6);
     bullet.setDepth(7);
-    // ---- 子弹方向翻转（原图朝右 → 改成朝左）----
     bullet.setFlipX(true);
     bullet.setVelocityX(-350);
     bullet.bulletLife = 4.0;
@@ -615,7 +611,7 @@ function restartGame() {
 
     if (rock) {
         rock.x = GAME_W + 200;
-        rock.y = GROUND_Y - 60;
+        rock.y = GROUND_Y - 40;
         rockSpeed = 5;
         rock.clearTint();
         rock.setVisible(true);
