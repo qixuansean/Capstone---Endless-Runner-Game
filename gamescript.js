@@ -774,14 +774,13 @@ function restartGame() {
     scene.cameras.main.fadeIn(300);
 }
 
-/* =========================
-   PHASER CONFIG
-========================= */
 var config = {
 
     type: Phaser.AUTO,
+
     width: 710,
     height: 500,
+
     parent: "gameContainer",
 
     physics: {
@@ -801,7 +800,9 @@ var config = {
 
     scale: {
         mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 710,
+        height: 500
     }
 };
 
