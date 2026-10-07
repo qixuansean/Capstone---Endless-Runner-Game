@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 游戏容器 -->
+<div id="gameContainer"></div>
+
+<!-- 对话框（必须有） -->
+<div id="dialogue-overlay" style="display:none;">
+    <div class="dialogue-box">
+        <div class="dialogue-name" id="dialogue-name"></div>
+        <div class="dialogue-text" id="dialogue-text"></div>
+    </div>
+</div>
+
+<!-- 结尾视频（必须有） -->
+<video id="endingVideo" 
+       style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:200;"
+       playsinline>
+</video>
+
+    <video id="endingVideo" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:100;"></video>
+
+    <script src="/resources/js/phaser.3.18.1.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
