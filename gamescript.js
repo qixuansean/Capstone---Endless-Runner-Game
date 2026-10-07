@@ -98,10 +98,10 @@ function preload() {
         frameHeight: 402
     });
 
-    scene.load.image("pit", "/res/5968b581-2a83-4580-b93d-05b8dd9584b1/Screenshot_2026-10-07_201815-removebg-preview.png");
-    scene.load.image("jet", "/res/5968b581-2a83-4580-b93d-05b8dd9584b1/Screenshot_2026-10-07_201520-removebg-preview.png");
-    scene.load.image("bullet", "/res/5968b581-2a83-4580-b93d-05b8dd9584b1/Screenshot_2026-10-07_201631-removebg-preview.png");
-    scene.load.image("familyDino", "/res/5968b581-2a83-4580-b93d-05b8dd9584b1/Screenshot_2026-10-07_201711-removebg-preview.png");
+    scene.load.image("pit", "/resources/pit.png");
+    scene.load.image("jet", "/resources/jet.png");
+    scene.load.image("bullet", "/resources/bullet.png");
+    scene.load.image("familyDino", "/resources/familyDino.png");
 }
 
 /* =========================
