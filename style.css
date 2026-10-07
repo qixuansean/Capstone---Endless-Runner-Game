@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    background-color: #000000;
+}
+#dialogue-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 100;
+}
+.dialogue-box {
+    background: rgba(8, 8, 8, 0.93);
+    border: 2px solid rgba(255,255,255,0.35);
+    border-radius: 12px;
+    padding: 16px 22px;
+    width: 90%;
+    max-width: 680px;
+    color: white;
+    font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.55);
+}
+.dialogue-name {
+    color: #c8ff7a;
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.dialogue-text {
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.55;
+}
