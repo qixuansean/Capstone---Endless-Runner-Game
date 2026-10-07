@@ -1,0 +1,150 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Oswald", sans-serif;
+    color: #ffffff;
+}
+
+/* select all the headings on the page */
+h1, h2, h3 {
+   font-family: "Sigmar One", sans-serif; 
+}
+
+
+h1 {
+    font-size: 50px;
+    text-shadow: 2px 2px 6px #000000;
+}
+
+
+h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 36px;  
+    text-shadow: 2px 2px 8px #27292C;
+}
+
+
+h3 {
+    color:  #edc60f;
+    font-size: 30px;
+    text-shadow: 2px 2px 5px #51545F;
+}
+
+
+/* header at the top of the page with the title and buttons */
+header {
+    background-image: url("/resources/sandbox_templates/techready-capstone---promotional-webpage/landscape-1844229_1280.png");
+    background-size: cover;
+    background-position: center center;
+    text-align: center;
+    height: 80vh;
+    width: 100vw;
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+}
+
+button {
+    font-family: "Oswald", sans-serif;
+    font-size: 26px;
+    background-color: #edc60f;
+    border: 3px solid #edc60f;
+    margin: 8px;
+    padding: 10px;
+    transition: 0.2s;
+    width: 250px;
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+
+/* styling for the buttons when you hover over them */
+button:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+
+/* styling for the "Pre-Order Now" button when you hover over it */
+button.regular-btn:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+
+/* styling for the "Watch Trailer" button */
+button.transparent-btn {
+  	background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+}
+
+
+/* styling for the "Watch Trailer" button when you hover over it */
+button.transparent-btn:hover {
+    background-color: #edc60f;
+}
+
+
+p {
+    font-size: 22px;
+}
+
+
+/* <div> beneath the top banner that creates the section to introduce the website topic */
+#about-section {
+    background-color: #41924B;
+    padding: 2% 10%;
+    min-height: auto;
+    position: relative;
+    color: #ffffff;
+    text-align: center;
+}
+
+
+/* <div> element that wraps around the main content with images and text side-by-side */
+div.main-content-wrapper {
+    background-color: #4695d6;
+    padding: 30px 50px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* the two <div> elements inside each flex container */
+div.flex-item {
+    margin: 0 1%;
+}
+
+/* <div> that contains the image */
+div.img-wrapper {
+    flex-grow: 1;
+    flex-basis: 0;
+    display: flex;
+    align-items: center;
+}
+
+img {
+    width: 250px;
+}
+
+
+/* <div> that contains the text for the main content */
+div.text-wrapper {
+    flex-grow: 2;
+    flex-basis: 0;
+    padding: 10px;
+}
+
+footer {
+    text-align: center;
+    background-color: #41924B;
+    padding: 5px;
+    font-size: 12px;
+}
+
+
