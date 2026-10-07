@@ -1,5 +1,5 @@
 /* ============================================================
-   gamescript.js — 固定世界尺寸 + FIT 缩放（不变形、无黑边）
+   gamescript.js — 固定世界尺寸 + FIT 缩放（最终调整版）
    ============================================================ */
 
 let scene;
@@ -12,7 +12,6 @@ let distanceText;
 
 let fighterJet;
 let bomb;
-let pits = [];
 let bullets = [];
 let familyDino;
 let caveOverlay;
@@ -27,7 +26,6 @@ let gameTime = 0;
 let jetActive = false;
 let jetShooting = false;
 let lastBulletTime = 0;
-let pitSpawnTimer = 0;
 let caveEntered = false;
 let familyReunited = false;
 let jetFlyByDone = false;
@@ -50,8 +48,8 @@ const config = {
     parent: "gameContainer",
     backgroundColor: "#87CEEB",
     scale: {
-        mode: Phaser.Scale.FIT,                 // 保持比例，不变形
-        autoCenter: Phaser.Scale.CENTER_BOTH,   // 居中
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
         width: GAME_W,
         height: GAME_H
     },
@@ -84,7 +82,6 @@ function init() {
     jetActive = false;
     jetShooting = false;
     lastBulletTime = 0;
-    pitSpawnTimer = 0;
     caveEntered = false;
     familyReunited = false;
     jetFlyByDone = false;
@@ -92,7 +89,6 @@ function init() {
     chasingDialogueShown = false;
 
     dialogueEvent = null;
-    pits = [];
     bullets = [];
 }
 
@@ -111,7 +107,7 @@ function preload() {
     scene.load.spritesheet("dino_fall", "resources/Dino_FallAnim.png", {
         frameWidth: 632, frameHeight: 402
     });
-    scene.load.image("pit", "resources/pit.png");
+    // 已删除 pit
     scene.load.image("jet", "resources/jet.png");
     scene.load.image("bullet", "resources/bullet.png");
     scene.load.image("familyDino", "resources/familyDino.png");
@@ -139,10 +135,6 @@ function generatePlaceholder(key) {
         g.fillStyle(0xffcc00, 1);
         g.fillRoundedRect(0, 0, 200, 80, 20);
         g.generateTexture("restartButton", 200, 80);
-    } else if (key === "pit") {
-        g.fillStyle(0x222222, 1);
-        g.fillEllipse(80, 40, 160, 80);
-        g.generateTexture("pit", 160, 80);
     } else if (key === "jet") {
         g.fillStyle(0xcccccc, 1);
         g.fillTriangle(0, 40, 160, 20, 160, 60);
@@ -157,7 +149,6 @@ function generatePlaceholder(key) {
         g.fillRect(0, 0, 80, 100);
         g.generateTexture("familyDino", 80, 100);
     } else if (key === "dino_run" || key === "dino_fall") {
-        // 生成 1:1 正方形贴图，避免恐龙被压扁
         g.fillStyle(0x228B22, 1);
         g.fillRect(0, 0, 100, 100);
         g.generateTexture(key, 100, 100);
@@ -171,7 +162,7 @@ function create() {
     scene = this;
 
     const requiredKeys = [
-        "bg", "floor", "rock", "restartButton", "pit",
+        "bg", "floor", "rock", "restartButton",
         "jet", "bullet", "familyDino", "dino_run", "dino_fall"
     ];
     requiredKeys.forEach(key => {
@@ -185,7 +176,7 @@ function create() {
     dialogueNameEl = document.getElementById("dialogue-name");
     dialogueTextEl = document.getElementById("dialogue-text");
 
-    // 背景铺满整个固定世界
+    // 背景
     background = scene.add.tileSprite(0, 0, GAME_W, GAME_H, "bg");
     background.setOrigin(0, 0);
     background.setDepth(0);
@@ -227,21 +218,21 @@ function create() {
         });
     }
 
-    // 玩家：固定世界坐标，与地面顶部对齐
-    player = scene.physics.add.sprite(200, GROUND_Y - 100, "dino_run");
-    // 关键：把恐龙贴图按原比例缩放，不拉伸
-    player.setScale(0.3);
+    // ---- 玩家（缩小到 0.18，原 0.3 缩小约 1.7 倍）----
+    player = scene.physics.add.sprite(200, GROUND_Y - 60, "dino_run");
+    player.setScale(0.18);
     if (player.anims && scene.anims.exists("run")) player.play("run");
-    player.setSize(60, 100);
-    player.setOffset(20, 0);
+    player.setSize(120, 300);
+    player.setOffset(160, 60);
     player.setDepth(4);
 
-    // 岩石
-    rock = scene.physics.add.sprite(GAME_W + 200, GROUND_Y - 50, "rock");
+    // ---- 岩石（站在地面上）----
+    rock = scene.physics.add.sprite(GAME_W + 200, GROUND_Y - 60, "rock");
     rock.setScale(0.8);
     rock.setDepth(3);
     rock.body.setSize(60, 60);
     rock.body.setOffset(20, 20);
+    rock.setBounce(0);
 
     // 距离文字
     distanceText = scene.add.text(16, 12, "Distance: 0.00 m", {
@@ -318,42 +309,11 @@ function update() {
         distanceText.setText("Distance: " + distance.toFixed(2) + " m");
     }
 
-    if (!caveEntered) updatePits();
     updateJet();
     updateBullets();
 
     if (!caveEntered && distance >= 100) enterCave();
     if (caveEntered && !familyReunited && distance >= 105) onFamilyReunion();
-}
-
-/* ---------- 坑系统 ---------- */
-function updatePits() {
-    if (distance >= 30 && distance < 45) {
-        pitSpawnTimer += scene.game.loop.delta / 1000;
-        if (pitSpawnTimer >= 2.0) {
-            pitSpawnTimer = 0;
-            trySpawnPit();
-        }
-    }
-
-    for (let i = pits.length - 1; i >= 0; i--) {
-        const pit = pits[i];
-        pit.x -= bgSpeed;
-        if (pit.x < -200) {
-            pit.destroy();
-            pits.splice(i, 1);
-        }
-    }
-}
-
-function trySpawnPit() {
-    if (rock && rock.x > 0 && rock.x < GAME_W) return;
-
-    const pit = scene.add.image(GAME_W + 100, GROUND_Y - 10, "pit");
-    pit.setOrigin(0.5, 0);
-    pit.setScale(0.6);
-    pit.setDepth(2);
-    pits.push(pit);
 }
 
 /* ---------- 战斗机系统 ---------- */
@@ -432,6 +392,8 @@ function fireBullet() {
     const bullet = scene.physics.add.sprite(fighterJet.x - 30, fighterJet.y, "bullet");
     bullet.setScale(0.6);
     bullet.setDepth(7);
+    // ---- 子弹方向翻转（原图朝右 → 改成朝左）----
+    bullet.setFlipX(true);
     bullet.setVelocityX(-350);
     bullet.bulletLife = 4.0;
     bullets.push(bullet);
@@ -483,9 +445,6 @@ function onBulletHit() {
 function enterCave() {
     if (caveEntered) return;
     caveEntered = true;
-
-    for (const pit of pits) pit.destroy();
-    pits = [];
 
     if (rock) {
         rock.setVisible(false);
@@ -656,7 +615,7 @@ function restartGame() {
 
     if (rock) {
         rock.x = GAME_W + 200;
-        rock.y = GROUND_Y - 50;
+        rock.y = GROUND_Y - 60;
         rockSpeed = 5;
         rock.clearTint();
         rock.setVisible(true);
@@ -665,10 +624,10 @@ function restartGame() {
 
     if (player) {
         player.x = 200;
-        player.y = GROUND_Y - 100;
+        player.y = GROUND_Y - 60;
         player.setVelocity(0, 0);
         player.body.enable = true;
-        player.setScale(0.3);
+        player.setScale(0.18);
         player.setAlpha(1);
         player.setVisible(true);
         if (scene.anims.exists("run")) player.anims.play("run");
@@ -681,15 +640,11 @@ function restartGame() {
     jetActive = false;
     jetShooting = false;
     lastBulletTime = 0;
-    pitSpawnTimer = 0;
     caveEntered = false;
     familyReunited = false;
     jetFlyByDone = false;
     bombDropped = false;
     chasingDialogueShown = false;
-
-    for (const pit of pits) pit.destroy();
-    pits = [];
 
     for (const bullet of bullets) bullet.destroy();
     bullets = [];
