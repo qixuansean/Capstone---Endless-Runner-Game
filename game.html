@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dino Escape · 响应式冒险</title>
     <link rel="stylesheet" href="gamestyle.css">
 </head>
-
 <body>
 
+    <!-- 游戏容器，Phaser 将自动填充并响应窗口变化 -->
     <div id="gameContainer"></div>
 
+    <!-- 对话层 -->
     <div id="dialogue-overlay" style="display:none;">
         <div class="dialogue-box">
             <div class="dialogue-name" id="dialogue-name"></div>
@@ -17,12 +19,13 @@
         </div>
     </div>
 
-    <video id="endingVideo"
-           style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:200;"
-           playsinline>
-    </video>
+    <!-- 结局视频（可选保留，本代码未使用视频，但保留结构） -->
+    <video id="endingVideo" playsinline muted loop></video>
 
-    <script src="resources/js/phaser.min.js"></script>
+    <!-- Phaser 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+
+    <!-- 游戏逻辑 -->
     <script src="gamescript.js"></script>
 
 </body>
