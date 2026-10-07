@@ -1,5 +1,5 @@
 /* ============================================================
-   gamescript.js — 响应式恐龙冒险（最终修复版）
+   gamescript.js — 响应式恐龙冒险（最终稳定版）
    ============================================================ */
 
 let scene;
@@ -39,15 +39,22 @@ let dialogueNameEl;
 let dialogueTextEl;
 let dialogueEvent = null;
 
+// ---- 固定游戏世界尺寸 ----
+const GAME_W = 1024;
+const GAME_H = 576;
+const GROUND_Y = 440;      // 地面顶部 y 坐标
+const GROUND_H = 136;      // 地面高度
+const PLAYER_GROUND_Y = GROUND_Y - 10;  // 玩家脚踩地面的位置
+
 const config = {
     type: Phaser.AUTO,
     parent: "gameContainer",
     backgroundColor: "#87CEEB",
     scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.FIT,           // 关键：FIT 保持比例缩放，坐标系统一
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
+        width: GAME_W,
+        height: GAME_H
     },
     physics: {
         default: "arcade",
@@ -121,8 +128,10 @@ function generatePlaceholder(key) {
         g.generateTexture("bg", 512, 512);
     } else if (key === "floor") {
         g.fillStyle(0x5a8f3d, 1);
-        g.fillRect(0, 0, 512, 128);
-        g.generateTexture("floor", 512, 128);
+        g.fillRect(0, 0, 256, 136);
+        g.fillStyle(0x3d6b28, 1);
+        g.fillRect(0, 0, 256, 20);
+        g.generateTexture("floor", 256, 136);
     } else if (key === "rock") {
         g.fillStyle(0x777777, 1);
         g.fillCircle(50, 50, 50);
@@ -177,19 +186,16 @@ function create() {
     dialogueNameEl = document.getElementById("dialogue-name");
     dialogueTextEl = document.getElementById("dialogue-text");
 
-    const w = scene.scale.width;
-    const h = scene.scale.height;
-
-    // 背景
-    background = scene.add.tileSprite(0, 0, w, h, "bg");
+    // 背景（铺满整个游戏世界）
+    background = scene.add.tileSprite(0, 0, GAME_W, GAME_H, "bg");
     background.setOrigin(0, 0);
     background.setDepth(0);
 
-    // 地面
-    floor = scene.add.tileSprite(0, h - 200, w, 200, "floor");
+    // 地面（固定在世界坐标，永远不会动位置）
+    floor = scene.add.tileSprite(0, GROUND_Y, GAME_W, GROUND_H, "floor");
     floor.setOrigin(0, 0);
     scene.physics.add.existing(floor, true);
-    floor.body.setSize(w, 200);
+    floor.body.setSize(GAME_W, GROUND_H);
     floor.body.setOffset(0, 0);
     floor.setDepth(1);
 
@@ -222,23 +228,23 @@ function create() {
         });
     }
 
-    // 玩家
-    player = scene.physics.add.sprite(200, h - 300, "dino_run");
+    // 玩家（固定在地面之上）
+    player = scene.physics.add.sprite(200, PLAYER_GROUND_Y - 100, "dino_run");
     player.setScale(0.28);
     if (player.anims && scene.anims.exists("run")) player.play("run");
-    player.setSize(60, 100);
-    player.setOffset(0, 0);
+    player.setSize(150, 340);
+    player.setOffset(120, 30);
     player.setDepth(4);
     player.setCollideWorldBounds(false);
 
     // 岩石
-    rock = scene.physics.add.sprite(w + 200, h - 220, "rock");
+    rock = scene.physics.add.sprite(GAME_W + 200, GROUND_Y - 60, "rock");
     rock.setScale(0.8);
     rock.setDepth(3);
     rock.body.setSize(60, 60);
     rock.body.setOffset(20, 20);
 
-    // 距离文字
+    // 距离文字（固定在屏幕上）
     distanceText = scene.add.text(16, 12, "Distance: 0.00 m", {
         fontFamily: "Microsoft YaHei, SimHei, Arial, sans-serif",
         color: "#222222",
@@ -262,13 +268,13 @@ function create() {
     bomb.setDepth(8);
     bomb.setVisible(false);
 
-    // 洞穴遮罩
-    caveOverlay = scene.add.rectangle(w / 2, 150, w, 300, 0x555555, 1);
+    // 洞穴遮罩（覆盖上半部分）
+    caveOverlay = scene.add.rectangle(GAME_W / 2, 150, GAME_W, 300, 0x555555, 1);
     caveOverlay.setDepth(15);
     caveOverlay.setVisible(false);
 
     // 家人恐龙
-    familyDino = scene.add.image(w + 100, h - 280, "familyDino");
+    familyDino = scene.add.image(GAME_W + 100, GROUND_Y - 80, "familyDino");
     familyDino.setScale(0.8);
     familyDino.setDepth(3);
     familyDino.setVisible(false);
@@ -281,49 +287,19 @@ function create() {
     // 输入
     scene.input.on("pointerdown", dinoJump);
 
-    // 重新开始按钮
-    restartButton = scene.add.sprite(w / 2, h / 2, "restartButton");
+    // 重新开始按钮（固定在屏幕中心）
+    restartButton = scene.add.sprite(GAME_W / 2, GAME_H / 2, "restartButton");
     restartButton.setInteractive({ useHandCursor: true });
     restartButton.setScale(0.6);
     restartButton.setDepth(40);
     restartButton.setScrollFactor(0);
     restartButton.on("pointerdown", restartGame);
     restartButton.setVisible(false);
-
-    // 窗口 resize 处理
-    scene.scale.on("resize", (gameSize) => {
-        const newW = gameSize.width;
-        const newH = gameSize.height;
-
-        if (background) {
-            background.width = newW;
-            background.height = newH;
-            background.setPosition(0, 0);
-        }
-
-        if (floor) {
-            floor.width = newW;
-            floor.setPosition(0, newH - 200);
-            floor.body.setSize(newW, 200);
-        }
-
-        if (caveOverlay) {
-            caveOverlay.width = newW;
-            caveOverlay.x = newW / 2;
-        }
-
-        if (restartButton) {
-            restartButton.x = newW / 2;
-            restartButton.y = newH / 2;
-        }
-    });
 }
 
 /* ---------- UPDATE ---------- */
 function update() {
     if (gameOver) return;
-
-    const w = scene.scale.width;
 
     gameTime += scene.game.loop.delta / 1000;
 
@@ -333,7 +309,7 @@ function update() {
     if (!caveEntered && rock && rock.body) {
         rock.x -= rockSpeed;
         if (rock.x < -100) {
-            rock.x = w + 100;
+            rock.x = GAME_W + 100;
             rockSpeed = Math.min(rockSpeed + 0.12, 12);
         }
     }
@@ -374,9 +350,9 @@ function updatePits() {
 }
 
 function trySpawnPit() {
-    if (rock && rock.x > 0 && rock.x < scene.scale.width) return;
+    if (rock && rock.x > 0 && rock.x < GAME_W) return;
 
-    const pit = scene.add.image(scene.scale.width + 100, scene.scale.height - 140, "pit");
+    const pit = scene.add.image(GAME_W + 100, GROUND_Y - 10, "pit");
     pit.setOrigin(0.5, 0);
     pit.setScale(0.6);
     pit.setDepth(2);
@@ -385,8 +361,6 @@ function trySpawnPit() {
 
 /* ---------- 战斗机系统 ---------- */
 function updateJet() {
-    const w = scene.scale.width;
-
     if (distance >= 10 && !jetFlyByDone) {
         jetFlyByDone = true;
         fighterJet.setVisible(true);
@@ -395,7 +369,7 @@ function updateJet() {
 
         scene.tweens.add({
             targets: fighterJet,
-            x: w + 200,
+            x: GAME_W + 200,
             duration: 3000,
             ease: "Linear",
             onComplete: () => fighterJet.setVisible(false)
@@ -412,7 +386,7 @@ function updateJet() {
 
         scene.tweens.add({
             targets: bomb,
-            y: scene.scale.height - 200,
+            y: GROUND_Y,
             duration: 800,
             ease: "Bounce.easeIn",
             onComplete: () => {
@@ -429,12 +403,12 @@ function updateJet() {
         jetActive = true;
         jetShooting = true;
         fighterJet.setVisible(true);
-        fighterJet.x = w + 100;
+        fighterJet.x = GAME_W + 100;
         fighterJet.y = 90;
 
         scene.tweens.add({
             targets: fighterJet,
-            x: w - 100,
+            x: GAME_W - 100,
             duration: 1000,
             ease: "Sine.easeOut"
         });
@@ -446,7 +420,7 @@ function updateJet() {
     }
 
     if (jetActive && jetShooting && !caveEntered && distance < 100) {
-        fighterJet.x = Phaser.Math.Linear(fighterJet.x, w - 80, 0.02);
+        fighterJet.x = Phaser.Math.Linear(fighterJet.x, GAME_W - 80, 0.02);
         fighterJet.y = Phaser.Math.Linear(fighterJet.y, 80 + Math.sin(gameTime * 2) * 15, 0.05);
 
         if (gameTime - lastBulletTime >= 1) {
@@ -482,7 +456,7 @@ function updateBullets() {
             }
         }
 
-        if (bullet.bulletLife <= 0 || bullet.x < -100 || bullet.x > scene.scale.width + 100) {
+        if (bullet.bulletLife <= 0 || bullet.x < -100 || bullet.x > GAME_W + 100) {
             bullet.destroy();
             bullets.splice(i, 1);
         }
@@ -530,7 +504,7 @@ function enterCave() {
     if (fighterJet && fighterJet.visible) {
         scene.tweens.add({
             targets: fighterJet,
-            x: scene.scale.width + 300,
+            x: GAME_W + 300,
             y: -100,
             duration: 1500,
             ease: "Power2",
@@ -542,7 +516,7 @@ function enterCave() {
 
     scene.tweens.add({
         targets: player,
-        x: scene.scale.width - 220,
+        x: GAME_W - 220,
         duration: 2000,
         ease: "Sine.easeIn"
     });
@@ -555,23 +529,20 @@ function onFamilyReunion() {
     if (familyReunited) return;
     familyReunited = true;
 
-    const w = scene.scale.width;
-    const h = scene.scale.height;
-
     familyDino.setVisible(true);
-    familyDino.x = w + 80;
-    familyDino.y = h - 280;
+    familyDino.x = GAME_W + 80;
+    familyDino.y = GROUND_Y - 80;
 
     scene.tweens.add({
         targets: familyDino,
-        x: w - 130,
+        x: GAME_W - 130,
         duration: 2000,
         ease: "Sine.easeOut"
     });
 
     scene.tweens.add({
         targets: player,
-        x: w - 250,
+        x: GAME_W - 250,
         duration: 2000,
         ease: "Sine.easeOut"
     });
@@ -592,8 +563,8 @@ function onFamilyReunion() {
             scene.cameras.main.setBackgroundColor(0x000000);
 
             const endText = scene.add.text(
-                scene.scale.width / 2,
-                scene.scale.height / 2,
+                GAME_W / 2,
+                GAME_H / 2,
                 "THE END",
                 {
                     fontFamily: "Microsoft YaHei, SimHei, Arial, sans-serif",
@@ -686,12 +657,9 @@ function restartGame() {
     distance = 0;
     if (distanceText) distanceText.setText("Distance: 0.00 m");
 
-    const w = scene.scale.width;
-    const h = scene.scale.height;
-
     if (rock) {
-        rock.x = w + 200;
-        rock.y = h - 220;
+        rock.x = GAME_W + 200;
+        rock.y = GROUND_Y - 60;
         rockSpeed = 5;
         rock.clearTint();
         rock.setVisible(true);
@@ -700,7 +668,7 @@ function restartGame() {
 
     if (player) {
         player.x = 200;
-        player.y = h - 300;
+        player.y = PLAYER_GROUND_Y - 100;
         player.setVelocity(0, 0);
         player.body.enable = true;
         player.setScale(0.28);
@@ -747,7 +715,7 @@ function restartGame() {
 
     if (familyDino) {
         familyDino.setVisible(false);
-        familyDino.x = w + 100;
+        familyDino.x = GAME_W + 100;
     }
 
     bgSpeed = 5;
