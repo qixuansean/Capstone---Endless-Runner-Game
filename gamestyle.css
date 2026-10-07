@@ -21,10 +21,9 @@ body {
     overflow: hidden;
 }
 
+/* 不要强制设置 width / height */
 #gameContainer canvas {
     display: block;
-    width: 100vw !important;
-    height: 100vh !important;
 }
 
 #dialogue-overlay {
