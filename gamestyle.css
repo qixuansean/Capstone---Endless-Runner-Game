@@ -1,136 +1,34 @@
-/* =========================
-   全局重置
-========================= */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 html, body {
+    margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    background: #000;
     overflow: hidden;
-    font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
-}
-
-/* =========================
-   游戏容器
-========================= */
-#gameContainer {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: #000;
 }
-
-#gameContainer canvas {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
+#gameContainer {
+    width: 100%;
+    height: 100%;
 }
-
-/* =========================
-   对话框遮罩层
-========================= */
 #dialogue-overlay {
     position: fixed;
     left: 0;
-    bottom: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    display: none;              /* 默认隐藏，由 JS 控制 */
-    align-items: flex-end;
+    display: none;
     justify-content: center;
-    pointer-events: none;       /* 不阻挡点击（跳跃） */
-    z-index: 999;
-    padding-bottom: 24px;
+    align-items: flex-end;
+    padding-bottom: 40px;
+    pointer-events: none;
+    z-index: 1000;
 }
-
-/* =========================
-   对话框主体
-========================= */
 .dialogue-box {
-    width: min(680px, 90%);
-    background: rgba(0, 0, 0, 0.82);
-    border: 3px solid #ffffff;
-    border-radius: 14px;
-    padding: 16px 22px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    animation: dialogueIn 0.25s ease-out;
-}
-
-/* =========================
-   说话者名字
-========================= */
-.dialogue-name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ffd54a;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    text-shadow: 1px 1px 2px #000;
-}
-
-/* =========================
-   对话文字
-========================= */
-.dialogue-text {
-    font-size: 20px;
-    line-height: 1.5;
-    color: #ffffff;
-    text-shadow: 1px 1px 2px #000;
-    word-wrap: break-word;
-}
-
-/* =========================
-   危险对话样式（UNKNOWN / 威胁）
-========================= */
-#dialogue-overlay.danger-dialogue .dialogue-box {
-    background: rgba(60, 0, 0, 0.9);
-    border-color: #ff2a2a;
-    box-shadow: 0 0 24px rgba(255, 0, 0, 0.7);
-}
-
-#dialogue-overlay.danger-dialogue .dialogue-name {
-    color: #ff4d4d;
-}
-
-#dialogue-overlay.danger-dialogue .dialogue-text {
-    color: #ffd6d6;
-}
-
-/* =========================
-   出现动画
-========================= */
-@keyframes dialogueIn {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* =========================
-   移动端适配
-========================= */
-@media (max-width: 480px) {
-    .dialogue-box {
-        padding: 12px 16px;
-        border-radius: 10px;
-    }
-
-    .dialogue-name {
-        font-size: 15px;
-    }
-
-    .dialogue-text {
-        font-size: 16px;
-    }
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 16px 24px;
+    border-radius: 12px;
+    max-width: 80%;
+    text-align: center;
 }
