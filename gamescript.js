@@ -708,8 +708,8 @@ function restartGame() {
 ========================= */
 var config = {
     type: Phaser.AUTO,
-    width: 710,          // 逻辑宽度（保持原有所有坐标/速度不变）
-    height: 500,         // 逻辑高度
+    width: 710,          // 逻辑宽度保持不变
+    height: 500,         // 逻辑高度保持不变
     parent: "gameContainer",
     backgroundColor: "#000000",
     physics: {
@@ -726,9 +726,7 @@ var config = {
         update: update
     },
     scale: {
-        mode: Phaser.Scale.FIT,          // 等比缩放，完整显示，两边可能有黑边
-        // 如果想真正“铺满”整个窗口（可能裁剪），改成 Phaser.Scale.RESIZE
-        // mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.ENVELOP,   // ← 关键！铺满屏幕，去掉黑边
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 710,
         height: 500
