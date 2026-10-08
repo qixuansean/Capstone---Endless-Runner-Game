@@ -1,8 +1,6 @@
 /* =========================
    请确保 HTML 中有以下结构：
-
    <div id="gameContainer"></div>
-
    <div id="dialogue-overlay" style="display:none;">
        <div class="dialogue-box">
            <div class="dialogue-name" id="dialogue-name"></div>
@@ -10,7 +8,6 @@
        </div>
    </div>
 ========================= */
-
 let scene;
 let background;
 let floor;
@@ -18,21 +15,18 @@ let player;
 let rock;
 let restartButton;
 let distanceText;
-
 let fighterJet;
 let bomb;
 let pits = [];
 let bullets = [];
 let familyDino;
 let caveOverlay;
-
 let bgSpeed = 5;
 let rockSpeed = 5;
 let canJump = true;
 let distance = 0;
 let gameOver = false;
 let gameTime = 0;
-
 let jetActive = false;
 let jetShooting = false;
 let lastBulletTime = 0;
@@ -43,7 +37,6 @@ let jetFlyByDone = false;
 let bombDropped = false;
 let bombDialogueShown = false;
 let chasingDialogueShown = false;
-
 let dialogueOverlay;
 let dialogueNameEl;
 let dialogueTextEl;
@@ -59,7 +52,6 @@ function init() {
     distance = 0;
     gameOver = false;
     gameTime = 0;
-
     jetActive = false;
     jetShooting = false;
     lastBulletTime = 0;
@@ -70,9 +62,7 @@ function init() {
     bombDropped = false;
     bombDialogueShown = false;
     chasingDialogueShown = false;
-
     dialogueEvent = null;
-
     pits = [];
     bullets = [];
 }
@@ -82,22 +72,18 @@ function init() {
 ========================= */
 function preload() {
     scene = this;
-
     scene.load.image("bg", "/resources/forest_BG.png");
     scene.load.image("floor", "/resources/forest_floor.png");
     scene.load.image("rock", "/resources/rock.png");
     scene.load.image("restartButton", "/resources/restart_btn.png");
-
     scene.load.spritesheet("dino_run", "/resources/Dino_RunAnim.png", {
         frameWidth: 442,
         frameHeight: 455
     });
-
     scene.load.spritesheet("dino_fall", "/resources/Dino_FallAnim.png", {
         frameWidth: 632,
         frameHeight: 402
     });
-
     scene.load.image("pit", "/resources/pit.png");
     scene.load.image("jet", "/resources/jet.png");
     scene.load.image("bullet", "/resources/bullet.png");
@@ -108,27 +94,27 @@ function preload() {
    CREATE
 ========================= */
 function create() {
-
     dialogueOverlay = document.getElementById("dialogue-overlay");
     dialogueNameEl = document.getElementById("dialogue-name");
     dialogueTextEl = document.getElementById("dialogue-text");
 
+    // 使用固定逻辑分辨率，保证所有坐标/速度与原来一致
+    const W = config.width;
+    const H = config.height;
+
     background = scene.add.tileSprite(
-        config.width / 2,
-        config.height / 2,
+        W / 2,
+        H / 2,
         1000,
         750,
         "bg"
     );
-
     background.setScale(0.76);
     background.setDepth(0);
 
     floor = scene.add.tileSprite(0, 420, 1024, 128, "floor");
     floor.setOrigin(0, 0);
-
     scene.physics.add.existing(floor, true);
-
     floor.body.setSize(1500, 128);
     floor.setDepth(1);
 
@@ -141,7 +127,6 @@ function create() {
         frameRate: 13,
         repeat: -1
     });
-
     scene.anims.create({
         key: "fall",
         frames: scene.anims.generateFrameNumbers("dino_fall", {
@@ -172,7 +157,6 @@ function create() {
         stroke: "#ffffff",
         strokeThickness: 3
     });
-
     distanceText.setDepth(10);
     distanceText.setScrollFactor(0);
 
@@ -188,19 +172,18 @@ function create() {
 
     /* 山洞遮罩：只挡上半部分，实心 */
     caveOverlay = scene.add.rectangle(
-        config.width / 2,
+        W / 2,
         150,
-        config.width,
+        W,
         300,
         0x555555,
         1
     );
-
     caveOverlay.setDepth(15);
     caveOverlay.setVisible(false);
 
     /* 家人恐龙（老婆） */
-    familyDino = scene.add.image(config.width + 100, 370, "familyDino");
+    familyDino = scene.add.image(W + 100, 370, "familyDino");
     familyDino.setScale(0.28);
     familyDino.setDepth(3);
     familyDino.setVisible(false);
@@ -212,22 +195,33 @@ function create() {
     scene.input.on("pointerdown", dinoJump);
 
     restartButton = scene.add.sprite(
-        config.width / 2, config.height / 2, "restartButton"
+        W / 2, H / 2, "restartButton"
     );
-
     restartButton.setInteractive({ useHandCursor: true });
     restartButton.setScale(0.5);
     restartButton.setDepth(40);
     restartButton.setScrollFactor(0);
     restartButton.on("pointerdown", restartGame);
     restartButton.setVisible(false);
+
+    // 监听窗口大小变化（RESIZE 模式下会自动触发）
+    scene.scale.on("resize", onResize, scene);
+}
+
+/* =========================
+   窗口大小变化时只做必要调整
+========================= */
+function onResize(gameSize) {
+    // 逻辑尺寸始终是 710x500，这里主要保证 UI 居中
+    if (restartButton) {
+        restartButton.setPosition(config.width / 2, config.height / 2);
+    }
 }
 
 /* =========================
    UPDATE
 ========================= */
 function update() {
-
     if (gameOver) return;
 
     gameTime += scene.game.loop.delta / 1000;
@@ -237,7 +231,6 @@ function update() {
 
     if (!caveEntered) {
         rock.x -= rockSpeed;
-
         if (rock.x < -50) {
             rock.x = config.width + 40;
             rockSpeed = Math.min(rockSpeed + 0.12, 12);
@@ -245,7 +238,6 @@ function update() {
     }
 
     distance += 0.012;
-
     distanceText.setText(
         "Distance: " + distance.toFixed(2) + " m"
     );
@@ -270,10 +262,8 @@ function update() {
    坑系统
 ========================= */
 function updatePits() {
-
     if (distance >= 30 && distance < 45) {
         pitSpawnTimer += scene.game.loop.delta / 1000;
-
         if (pitSpawnTimer >= 2.0) {
             pitSpawnTimer = 0;
             trySpawnPit();
@@ -283,7 +273,6 @@ function updatePits() {
     for (let i = pits.length - 1; i >= 0; i--) {
         const pit = pits[i];
         pit.x -= bgSpeed;
-
         if (pit.x < -100) {
             pit.destroy();
             pits.splice(i, 1);
@@ -292,7 +281,6 @@ function updatePits() {
 }
 
 function trySpawnPit() {
-
     if (rock.x > 0 && rock.x < config.width) {
         return;
     }
@@ -300,11 +288,9 @@ function trySpawnPit() {
     const pit = scene.add.image(
         config.width + 50, 430, "pit"
     );
-
     pit.setOrigin(0.5, 0);
     pit.setScale(0.25);
     pit.setDepth(2);
-
     pits.push(pit);
 }
 
@@ -312,15 +298,12 @@ function trySpawnPit() {
    战斗机系统
 ========================= */
 function updateJet() {
-
     /* 10米：飞机飞过一次 + 对话框 */
     if (distance >= 10 && !jetFlyByDone) {
         jetFlyByDone = true;
-
         fighterJet.setVisible(true);
         fighterJet.x = -200;
         fighterJet.y = 100;
-
         scene.tweens.add({
             targets: fighterJet,
             x: config.width + 200,
@@ -330,18 +313,15 @@ function updateJet() {
                 fighterJet.setVisible(false);
             }
         });
-
         showDialogue("DINO", "A fighter jet?! Where did it come from?");
     }
 
     /* 20米：核弹落下 + 对话框 */
     if (distance >= 20 && !bombDropped) {
         bombDropped = true;
-
         bomb.setVisible(true);
         bomb.x = player.x - 100;
         bomb.y = -100;
-
         scene.tweens.add({
             targets: bomb,
             y: 400,
@@ -353,7 +333,6 @@ function updateJet() {
                 bomb.setVisible(false);
             }
         });
-
         showDialogue("DINO", "A bomb?! It's falling right behind me!");
     }
 
@@ -361,11 +340,9 @@ function updateJet() {
     if (distance >= 50 && !jetActive) {
         jetActive = true;
         jetShooting = true;
-
         fighterJet.setVisible(true);
         fighterJet.x = config.width + 100;
         fighterJet.y = 90;
-
         scene.tweens.add({
             targets: fighterJet,
             x: config.width - 100,
@@ -380,13 +357,11 @@ function updateJet() {
     }
 
     if (jetActive && jetShooting && !caveEntered && distance < 100) {
-
         fighterJet.x = Phaser.Math.Linear(
             fighterJet.x,
             config.width - 80,
             0.02
         );
-
         fighterJet.y = Phaser.Math.Linear(
             fighterJet.y,
             80 + Math.sin(gameTime * 2) * 15,
@@ -404,18 +379,15 @@ function updateJet() {
    发射子弹
 ========================= */
 function fireBullet() {
-
     const bullet = scene.physics.add.sprite(
         fighterJet.x - 30,
         fighterJet.y,
         "bullet"
     );
-
     bullet.setScale(0.08);
     bullet.setDepth(7);
     bullet.setVelocityX(-350);
     bullet.bulletLife = 4.0;
-
     bullets.push(bullet);
 }
 
@@ -423,18 +395,13 @@ function fireBullet() {
    子弹更新
 ========================= */
 function updateBullets() {
-
     for (let i = bullets.length - 1; i >= 0; i--) {
-
         const bullet = bullets[i];
-
         bullet.bulletLife -= scene.game.loop.delta / 1000;
 
         if (!gameOver && !caveEntered) {
-
             const dx = Math.abs(bullet.x - player.x);
             const dy = Math.abs(bullet.y - player.y);
-
             if (dx < 30 && dy < 40) {
                 bullet.destroy();
                 bullets.splice(i, 1);
@@ -458,19 +425,13 @@ function updateBullets() {
    子弹击中
 ========================= */
 function onBulletHit() {
-
     if (gameOver) return;
-
     gameOver = true;
-
     player.setVelocity(0, 0);
     player.body.enable = false;
-
     scene.cameras.main.shake(700, 0.03);
     scene.cameras.main.flash(300, 255, 0, 0);
-
     showDialogue("DINO", "I've been hit!");
-
     scene.time.delayedCall(1800, () => {
         hideDialogue();
         scene.cameras.main.setBackgroundColor(0x000000);
@@ -482,9 +443,7 @@ function onBulletHit() {
    进入山洞
 ========================= */
 function enterCave() {
-
     if (caveEntered) return;
-
     caveEntered = true;
 
     for (const pit of pits) {
@@ -493,7 +452,6 @@ function enterCave() {
     pits = [];
 
     rock.setVisible(false);
-
     if (rock.body) {
         rock.body.enable = false;
     }
@@ -505,7 +463,6 @@ function enterCave() {
 
     jetActive = false;
     jetShooting = false;
-
     if (fighterJet.visible) {
         scene.tweens.add({
             targets: fighterJet,
@@ -537,15 +494,12 @@ function enterCave() {
    家人团聚（105米）
 ========================= */
 function onFamilyReunion() {
-
     if (familyReunited) return;
-
     familyReunited = true;
 
     /* 老婆从后面出现 */
     familyDino.setVisible(true);
     familyDino.x = config.width + 80;
-
     scene.tweens.add({
         targets: familyDino,
         x: config.width - 130,
@@ -556,7 +510,6 @@ function onFamilyReunion() {
     /* 老公从前面往后退一点，与老婆相遇 */
     player.setVisible(true);
     player.setAlpha(1);
-
     scene.tweens.add({
         targets: player,
         x: config.width - 250,
@@ -576,13 +529,9 @@ function onFamilyReunion() {
 
     /* 最后一句对话说完后 1.5 秒黑屏写完结 */
     scene.time.delayedCall(3500 + 3600 + 1500, () => {
-
         hideDialogue();
-
         scene.cameras.main.fade(1500, 0, 0, 0);
-
         scene.time.delayedCall(1500, () => {
-
             scene.cameras.main.setBackgroundColor(0x000000);
 
             /* 显示"完结"文字 */
@@ -597,7 +546,6 @@ function onFamilyReunion() {
                     fontStyle: "bold"
                 }
             );
-
             endText.setOrigin(0.5);
             endText.setDepth(100);
             endText.setScrollFactor(0);
@@ -622,41 +570,32 @@ function onFamilyReunion() {
    对话系统
 ========================= */
 function showDialogue(name, text, danger = false) {
-
     if (dialogueEvent) {
         dialogueEvent.remove(false);
         dialogueEvent = null;
     }
-
     if (!dialogueOverlay || !dialogueNameEl || !dialogueTextEl) {
         return;
     }
-
     dialogueNameEl.innerText = name || "";
     dialogueTextEl.innerText = text || "";
-
     if (danger) {
         dialogueOverlay.classList.add("danger-dialogue");
     } else {
         dialogueOverlay.classList.remove("danger-dialogue");
     }
-
     dialogueOverlay.style.display = "flex";
-
     dialogueEvent = scene.time.delayedCall(3600, () => {
         hideDialogue();
     });
 }
 
 function hideDialogue() {
-
     if (dialogueEvent) {
         dialogueEvent.remove(false);
         dialogueEvent = null;
     }
-
     if (!dialogueOverlay) return;
-
     dialogueOverlay.style.display = "none";
     dialogueOverlay.classList.remove("danger-dialogue");
 }
@@ -669,7 +608,6 @@ function onTheFloor() {
 }
 
 function dinoJump() {
-
     if (canJump && !gameOver && !caveEntered) {
         player.setVelocityY(-520);
         canJump = false;
@@ -677,17 +615,12 @@ function dinoJump() {
 }
 
 function onGameOver() {
-
     if (gameOver) return;
-
     gameOver = true;
-
     player.setVelocity(0, 0);
     player.anims.play("fall");
     player.body.enable = false;
-
     scene.cameras.main.shake(280, 0.015);
-
     scene.time.delayedCall(700, () => {
         restartButton.setVisible(true);
     });
@@ -697,7 +630,6 @@ function onGameOver() {
    重新开始
 ========================= */
 function restartGame() {
-
     distance = 0;
     distanceText.setText("Distance: 0.00 m");
 
@@ -706,14 +638,12 @@ function restartGame() {
     rockSpeed = 5;
     rock.clearTint();
     rock.setVisible(true);
-
     if (rock.body) {
         rock.body.enable = true;
     }
 
     player.x = 256;
     player.y = 380;
-
     player.setVelocity(0, 0);
     player.body.enable = true;
     player.setScale(0.28);
@@ -724,7 +654,6 @@ function restartGame() {
     canJump = true;
     gameOver = false;
     gameTime = 0;
-
     jetActive = false;
     jetShooting = false;
     lastBulletTime = 0;
@@ -775,15 +704,14 @@ function restartGame() {
 }
 
 /* =========================
-   PHASER CONFIG
+   PHASER CONFIG - 全屏自适应
 ========================= */
 var config = {
-
     type: Phaser.AUTO,
-    width: 710,
-    height: 500,
+    width: 710,          // 逻辑宽度（保持原有所有坐标/速度不变）
+    height: 500,         // 逻辑高度
     parent: "gameContainer",
-
+    backgroundColor: "#000000",
     physics: {
         default: "arcade",
         arcade: {
@@ -791,18 +719,33 @@ var config = {
             debug: false
         }
     },
-
     scene: {
         init: init,
         preload: preload,
         create: create,
         update: update
     },
-
     scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        mode: Phaser.Scale.FIT,          // 等比缩放，完整显示，两边可能有黑边
+        // 如果想真正“铺满”整个窗口（可能裁剪），改成 Phaser.Scale.RESIZE
+        // mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 710,
+        height: 500
     }
 };
 
 let game = new Phaser.Game(config);
+
+/* =========================
+   可选：按 F 键进入/退出浏览器全屏
+========================= */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "f" || e.key === "F") {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+            document.exitFullscreen().catch(() => {});
+        }
+    }
+});
