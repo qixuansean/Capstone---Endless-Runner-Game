@@ -272,8 +272,8 @@ function create() {
    生成随机障碍物
 ========================= */
 
+
 function spawnObstacle(x) {
-    // 随机选择 rock.png 或 rock2.png
     const texture = Phaser.Math.RND.pick([
         "rock",
         "rock2"
@@ -285,10 +285,16 @@ function spawnObstacle(x) {
         texture
     );
 
-    obstacle.setSize(40, 43);
-    obstacle.setOffset(25, 0);
-    obstacle.setDepth(3);
+    if (texture === "rock2") {
+        obstacle.setScale(0.5);
+        obstacle.setSize(40, 43);
+        obstacle.setOffset(25, 0);
+    } else {
+        obstacle.setSize(40, 43);
+        obstacle.setOffset(25, 0);
+    }
 
+    obstacle.setDepth(3);
     obstacle.body.setAllowGravity(false);
     obstacle.setImmovable(true);
 
