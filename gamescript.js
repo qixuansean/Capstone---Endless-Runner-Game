@@ -67,7 +67,9 @@ function init() {
     gameOver = false;
 
     distanceSinceSpawn = 0;
-    nextObstacleGap = Phaser.Math.Between(280, 520);
+    
+   nextObstacleGap = Phaser.Math.Between(330, 520);
+
 }
 
 
