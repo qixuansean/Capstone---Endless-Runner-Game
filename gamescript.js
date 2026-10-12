@@ -342,7 +342,7 @@ function update(time, delta) {
         distanceSinceSpawn = 0;
 
         nextObstacleGap = Phaser.Math.Between(
-            280,
+            330,
             520
         );
     }
