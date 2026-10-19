@@ -10,8 +10,8 @@ let rockSpeed = 5;
 let canJump = true;
 let distance = 0;
 let gameOver = false;
-let distanceSinceSpawn = 0;
-let nextObstacleGap = 350;
+let lastSpawnDistance = 0;
+let nextObstacleGap = 1.5;
 
 const config = {
     type: Phaser.AUTO,
@@ -48,8 +48,8 @@ function init() {
     canJump = true;
     distance = 0;
     gameOver = false;
-    distanceSinceSpawn = 0;
-    nextObstacleGap = Phaser.Math.Between(330, 520);
+    lastSpawnDistance = 0;
+    nextObstacleGap = 1.5;
 }
 
 function preload() {
@@ -120,8 +120,6 @@ function create() {
     obstacles = scene.physics.add.group();
     scene.physics.add.collider(player, obstacles, onGameOver);
 
-    spawnObstacle(W + 400);
-
     distanceText = scene.add.text(16, 12, "Distance: 0.00 m", {
         fontFamily: "Microsoft YaHei, SimHei, Arial, sans-serif",
         color: "#222222",
@@ -174,8 +172,6 @@ function update(time, delta) {
     background.tilePositionX += bgSpeed;
     floor.tilePositionX += bgSpeed;
 
-    distanceSinceSpawn += rockSpeed;
-
     obstacles.children.iterate((obstacle) => {
         if (!obstacle || !obstacle.active) {
             return;
@@ -186,10 +182,10 @@ function update(time, delta) {
         }
     });
 
-    if (distanceSinceSpawn >= nextObstacleGap) {
+    if (distance - lastSpawnDistance >= nextObstacleGap) {
         spawnObstacle(config.width + 40);
-        distanceSinceSpawn = 0;
-        nextObstacleGap = Phaser.Math.Between(330, 520);
+        lastSpawnDistance = distance;
+        nextObstacleGap = Phaser.Math.FloatBetween(0.5, 1.2);
     }
 
     distance += dt * 0.6;
@@ -243,8 +239,8 @@ function restartGame() {
     canJump = true;
     bgSpeed = 5;
     rockSpeed = 5;
-    distanceSinceSpawn = 0;
-    nextObstacleGap = Phaser.Math.Between(280, 520);
+    lastSpawnDistance = 0;
+    nextObstacleGap = 1.5;
 
     player.setPosition(256, 380);
     player.setVelocity(0, 0);
@@ -256,8 +252,6 @@ function restartGame() {
 
     distanceText.setText("Distance: 0.00 m");
     restartButton.setVisible(false);
-
-    spawnObstacle(config.width + 400);
 
     scene.cameras.main.resetFX();
     scene.cameras.main.setBackgroundColor("#000000");
