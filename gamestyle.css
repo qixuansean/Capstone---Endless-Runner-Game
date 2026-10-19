@@ -13,13 +13,6 @@ html, body {
         position: relative;
     }
 
-    /* 让 canvas 强制铺满容器 */
-    #gameContainer canvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-    }
-
     #dialogue-overlay {
         position: fixed;
         left: 0;
